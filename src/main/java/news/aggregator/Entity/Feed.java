@@ -1,5 +1,8 @@
 package news.aggregator.Entity;
 
+import antlr.StringUtils;
+import org.hibernate.validator.constraints.Length;
+
 import javax.persistence.*;
 import java.util.Date;
 
@@ -9,7 +12,14 @@ public class Feed {
     @GeneratedValue(strategy=GenerationType.IDENTITY)
     private Integer id;
 
+    private String guid;
+
+    private String title;
+
+    @Column(columnDefinition = "TEXT")
     private String description;
+
+    private String link;
 
     private Date datePublished;
 
@@ -17,7 +27,28 @@ public class Feed {
 
     @ManyToOne
     @JoinColumn
-    private FeedCategory categoryId;
+    private FeedCategory category;
+
+    @ManyToOne
+    @JoinColumn
+    private Source source;
+
+
+    public Boolean isValid()
+    {
+        if(
+                this.getGuid() == null ||
+                        this.getTitle() == null ||
+                        this.getDescription() == null ||
+                        this.getFeedCategory() == null ||
+                        this.getLink() == null ||
+                        this.getDatePublished() == null
+        )
+        {
+            return false;
+        }
+        return true;
+    }
 
     public Integer getId() {
         return id;
@@ -25,6 +56,33 @@ public class Feed {
 
     public void setId(Integer id) {
         this.id = id;
+    }
+
+    public String getGuid() {
+        return guid;
+    }
+
+    public void setGuid(String guid) {
+        this.guid = guid;
+        if(guid.length() > 100){
+            this.guid = guid.substring(0, 100);
+        }
+    }
+
+    public String getTitle() {
+        return title;
+    }
+
+    public void setTitle(String title) {
+        this.title = title;
+    }
+
+    public String getLink() {
+        return link;
+    }
+
+    public void setLink(String link) {
+        this.link = link;
     }
 
     public String getDescription() {
@@ -52,10 +110,18 @@ public class Feed {
     }
 
     public FeedCategory getFeedCategory() {
-        return categoryId;
+        return category;
     }
 
-    public void setFeedCategory(FeedCategory categoryId) {
-        this.categoryId = categoryId;
+    public void setFeedCategory(FeedCategory category) {
+        this.category = category;
+    }
+
+    public Source getSource() {
+        return source;
+    }
+
+    public void setSource(Source source) {
+        this.source = source;
     }
 }

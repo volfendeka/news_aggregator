@@ -1,9 +1,7 @@
 package news.aggregator.Entity;
 
-import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
-import javax.persistence.GenerationType;
-import javax.persistence.Id;
+import javax.persistence.*;
+import java.util.Set;
 
 @Entity // This tells Hibernate to make a table out of this class
 public class Source {
@@ -16,6 +14,9 @@ public class Source {
     private String baseUri;
 
     private String rssUri;
+
+    @OneToMany(mappedBy = "source", cascade = CascadeType.ALL)
+    private Set<Feed> feed;
 
     public Integer getId() {
         return id;
@@ -47,5 +48,13 @@ public class Source {
 
     public void setRssUri(String rssUri) {
         this.rssUri = rssUri;
+    }
+
+    public Set<Feed> getFeed() {
+        return feed;
+    }
+
+    public void setFeed(Set<Feed> feed) {
+        this.feed = feed;
     }
 }

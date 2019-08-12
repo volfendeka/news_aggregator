@@ -1,16 +1,25 @@
 package news.aggregator.Worker;
 
+import news.aggregator.Entity.Source;
+import news.aggregator.Service.FeedParser;
 import org.springframework.http.*;
 import org.springframework.web.client.RestTemplate;
 
 import java.util.Collections;
 
-public class RequestWorker implements Runnable{
 
-    private final String uri;
+public class RequestWorker extends Worker implements Runnable{
 
-    public RequestWorker(String uri){
-        this.uri = uri;
+    private String uri;
+    private Source source;
+    private FeedParser feedParser;
+
+
+    public RequestWorker(Source source, FeedParser feedParser)
+    {
+        this.uri = source.getRssUri();
+        this.source = source;
+        this.feedParser = feedParser;
     }
 
     public void run(){
@@ -21,9 +30,12 @@ public class RequestWorker implements Runnable{
         HttpEntity<String> entity = new HttpEntity<String>("parameters", headers);
 
 
-        ResponseEntity<String> result = restTemplate.exchange(uri, HttpMethod.GET, entity, String.class);
+        ResponseEntity<String> responseEntity = restTemplate.exchange(this.uri, HttpMethod.GET, entity, String.class);
 
-        System.out.println(uri + ": " + result.getStatusCode());
+        feedParser.parse(this.source, responseEntity);
+
+        System.out.println(this.uri + ": " + responseEntity.getStatusCode());
+
     }
 
 }

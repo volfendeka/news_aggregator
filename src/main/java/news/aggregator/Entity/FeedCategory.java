@@ -11,7 +11,7 @@ public class FeedCategory {
 
     private String name;
 
-    @OneToMany(mappedBy = "categoryId", cascade = CascadeType.ALL)
+    @OneToMany(mappedBy = "category", cascade = CascadeType.ALL)
     private Set<Feed> feed;
 
     public Integer getId() {
