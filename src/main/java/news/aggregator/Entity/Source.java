@@ -15,6 +15,18 @@ public class Source {
 
     private String rssUri;
 
+    @ManyToOne
+    @JoinColumn
+    private SourceStatus sourceStatus;
+
+    @ManyToOne
+    @JoinColumn
+    private SourceType sourceType;
+
+    @ManyToOne
+    @JoinColumn
+    private Country country;
+
     @OneToMany(mappedBy = "source", cascade = CascadeType.ALL)
     private Set<Feed> feed;
 
@@ -48,6 +60,30 @@ public class Source {
 
     public void setRssUri(String rssUri) {
         this.rssUri = rssUri;
+    }
+
+    public SourceType getSourceType() {
+        return sourceType;
+    }
+
+    public void setSourceType(SourceType sourceType) {
+        this.sourceType = sourceType;
+    }
+
+    public Country getCountry() {
+        return country;
+    }
+
+    public void setCountry(Country country) {
+        this.country = country;
+    }
+
+    public SourceStatus getSourceStatus() {
+        return sourceStatus;
+    }
+
+    public void setSourceStatus(SourceStatus sourceStatus) {
+        this.sourceStatus = sourceStatus;
     }
 
     public Set<Feed> getFeed() {

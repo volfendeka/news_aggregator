@@ -4,14 +4,16 @@ import javax.persistence.*;
 import java.util.Set;
 
 @Entity // This tells Hibernate to make a table out of this class
-public class SourceType {
+public class Country {
     @Id
     @GeneratedValue(strategy=GenerationType.IDENTITY)
     private Integer id;
 
+    private String code;
+
     private String name;
 
-    @OneToMany(mappedBy = "sourceType", cascade = CascadeType.ALL)
+    @OneToMany(mappedBy = "country", cascade = CascadeType.ALL)
     private Set<Source> source;
 
     public Integer getId() {
@@ -20,6 +22,14 @@ public class SourceType {
 
     public void setId(Integer id) {
         this.id = id;
+    }
+
+    public String getCode() {
+        return code;
+    }
+
+    public void setCode(String code) {
+        this.code = code;
     }
 
     public String getName() {
