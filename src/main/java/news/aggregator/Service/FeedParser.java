@@ -7,6 +7,7 @@ import news.aggregator.Entity.Source;
 import news.aggregator.Repository.FeedCategoryRepository;
 import news.aggregator.Repository.FeedRepository;
 import news.aggregator.Repository.SourceRepository;
+import org.hibernate.engine.jdbc.spi.SqlExceptionHelper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
@@ -21,6 +22,7 @@ import java.io.FileWriter;
 import java.io.StringReader;
 import java.util.Arrays;
 import java.util.Date;
+import java.util.List;
 import java.util.Optional;
 
 @Service
@@ -54,35 +56,50 @@ public class FeedParser {
             fw.write(responseEntity.getBody());
             fw.close();
 
-            Feed feed = new Feed();
-            for (int i=0; i<nl.getLength(); i++)
+            for (int i=0; i < nl.getLength(); i++)
             {
                 n = nl.item(i);
-                fw1.write(n.getNodeName() + ": " + getNodeString(n.getChildNodes()) + "\r\n");
-                fw1.write(n.getNodeName() + ": " + n.getTextContent() + "\r\n");
-                Date date = new Date();
-                feed.setDateCreated(date);
-                feed.setDatePublished(date);
-                feed.setFeedCategory(feedCategory);
-                if(n.getNodeName().equals(adapter.getTitle())){
-                    feed.setTitle(n.getTextContent());
-                }
-                if(n.getNodeName().equals(adapter.getDescription())){
-                    feed.setDescription(n.getTextContent());
-                }
-                if(n.getNodeName().equals(adapter.getLink())){
-                    feed.setLink(n.getTextContent());
-                }
-                if(n.getNodeName().equals(adapter.getGuid())){
-                    feed.setGuid(n.getTextContent());
+                if(n.getNodeName().equals(adapter.getItem())){
+                    NodeList itemChilds = n.getChildNodes();
+                    Node field;
+                    Feed feed = new Feed();
+
+                    for(int j=0; j < itemChilds.getLength(); j++){
+
+                        field = itemChilds.item(j);
+
+                        Date date = new Date();
+                        feed.setDateCreated(date);
+                        feed.setFeedCategory(feedCategory);
+                        if(field.getNodeName().equals(adapter.getTitle())){
+                            feed.setTitle(field.getTextContent());
+                        }
+                        if(field.getNodeName().equals(adapter.getDescription())){
+                            feed.setDescription(field.getTextContent());
+                        }
+                        if(field.getNodeName().equals(adapter.getLink())){
+                            feed.setLink(field.getTextContent());
+                        }
+                        if(field.getNodeName().equals(adapter.getGuid())){
+                            feed.setGuid(field.getTextContent());
+                        }
+                        if(field.getNodeName().equals(adapter.getPubDate())){
+                            List<String> parsePatterns = adapter.getParsePatterns();
+                            Date pubDate = adapter.convertDate(field.getTextContent(), parsePatterns);
+                            feed.setDatePublished(pubDate);
+                        }
+
+                        if(feed.isValid()){
+                            feed.setSource(source);
+                            feedRepository.save(feed);
+                            feed = new Feed();
+                        }
+                    }
                 }
 
-                if(feed.isValid()){
-                    feed.setSource(source);
-                    feedRepository.save(feed);
-                    System.out.print(feed.toString());
-                    feed = new Feed();
-                }
+                fw1.write(n.getNodeName() + ": " + getNodeString(n.getChildNodes()) + "\r\n");
+                fw1.write(n.getNodeName() + ": " + n.getTextContent() + "\r\n");
+
             }
             fw1.close();
 

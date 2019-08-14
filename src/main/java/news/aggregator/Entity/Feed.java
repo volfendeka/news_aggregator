@@ -12,11 +12,12 @@ public class Feed {
     @GeneratedValue(strategy=GenerationType.IDENTITY)
     private Integer id;
 
+    @Column(unique = true)
     private String guid;
 
     private String title;
 
-    @Column(columnDefinition = "TEXT")
+    @Column(columnDefinition = "text")
     private String description;
 
     private String link;
@@ -64,8 +65,8 @@ public class Feed {
 
     public void setGuid(String guid) {
         this.guid = guid;
-        if(guid.length() > 100){
-            this.guid = guid.substring(0, 100);
+        if(guid.length() > 254){
+            this.guid = guid.substring(0, 254);
         }
     }
 
@@ -98,6 +99,8 @@ public class Feed {
     }
 
     public void setDatePublished(Date datePublished) {
+        System.out.println("My parsed date setter:" + datePublished.toString());
+
         this.datePublished = datePublished;
     }
 
