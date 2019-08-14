@@ -1,13 +1,9 @@
 package news.aggregator.Adapter;
 
-import java.lang.reflect.Array;
 import java.lang.reflect.Constructor;
 import java.text.DateFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
-import java.time.LocalDate;
-import java.time.ZoneId;
-import java.time.format.DateTimeFormatter;
 import java.util.*;
 
 public class FeedAdapter {
@@ -19,7 +15,6 @@ public class FeedAdapter {
     private static String description    = "description";
     private static String link           = "link";
     private static String pubDate        = "pubDate";
-
     private static String item           = "item";
 
     public FeedAdapter(String name)
@@ -43,6 +38,40 @@ public class FeedAdapter {
         }
 
         return this;
+    }
+
+
+    public List<String> getParsePatterns()
+    {
+        List <String> patterns = new LinkedList<String>(Arrays.asList(
+                "E MMM dd HH:mm:ss Z yyyy",
+                "d-MMM-yyyy h:mm:ss a",
+                "EE, MMMM d, yyyy h:mm:ss a z",
+                "E, d MM yyyy hh:mm:ss Z",
+                "E, d MM yyyy hh:mm:ss z",
+                "EEE, d MMM yyyy HH:mm:ss Z",
+                "E, d M y hh:mm:ss Z",
+                "E, d MMM yyyy hh:mm:ss Z"
+        ));
+        return patterns;
+    }
+
+    public Date convertDate(String dateString, List<String> parsePatterns)
+    {
+        Integer lastIndex = parsePatterns.size() - 1;
+        String parsePattern = parsePatterns.get(lastIndex);
+        try{
+            parsePatterns.remove(parsePattern);
+            DateFormat formatter = new SimpleDateFormat(parsePattern);
+
+            return formatter.parse(dateString);
+        } catch (ParseException exception){
+            System.out.println(exception.toString());
+            return this.convertDate(dateString,parsePatterns);
+        }catch(Exception exception){
+            System.out.println(exception.toString());
+            return new Date();
+        }
     }
 
     public String getGuid() {
@@ -92,47 +121,5 @@ public class FeedAdapter {
 
     public void setItem(String item) {
         FeedAdapter.item = item;
-    }
-
-    public List<String> getParsePatterns()
-    {
-        List <String> patterns = new LinkedList<String>(Arrays.asList(
-                "E MMM dd HH:mm:ss Z yyyy",
-                "d-MMM-yyyy h:mm:ss a",
-                "EE, MMMM d, yyyy h:mm:ss a z",
-                "E, d MM yyyy hh:mm:ss Z",
-                "E, d MM yyyy hh:mm:ss z",
-                "EEE, d MMM yyyy HH:mm:ss Z",
-                "E, d MMM yyyy hh:mm:ss Z",
-                "E, d M y hh:mm:ss Z"
-        ));
-        return patterns;
-    }
-
-    public Date convertDate(String dateString, List<String> parsePatterns)
-    {
-        Integer lastIndex = parsePatterns.size() - 1;
-        String parsePattern = parsePatterns.get(lastIndex);
-        try{
-            System.out.println(dateString);
-            System.out.println(parsePattern);
-            parsePatterns.remove(parsePattern);
-            DateFormat formatter = new SimpleDateFormat(parsePattern);
-
-            Date date =  formatter.parse(dateString);
-
-            /*
-            DateTimeFormatter formatter = DateTimeFormatter.RFC_1123_DATE_TIME;
-            LocalDate parsedDate = LocalDate.parse(dateString, formatter);
-
-            Date date = Date.from(parsedDate.atStartOfDay(ZoneId.systemDefault()).toInstant());
-            */
-            return date;
-        } catch (ParseException exception){
-            return this.convertDate(dateString,parsePatterns);
-        }catch(Exception exception){
-            System.out.println(exception.toString());
-            return new Date();
-        }
     }
 }
