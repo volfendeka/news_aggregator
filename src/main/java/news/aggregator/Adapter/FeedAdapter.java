@@ -1,6 +1,5 @@
 package news.aggregator.Adapter;
 
-import java.lang.reflect.Constructor;
 import java.text.DateFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
@@ -10,34 +9,17 @@ public class FeedAdapter {
 
     private String sourceName;
 
-    private static String guid           = "guid";
-    private static String title          = "title";
-    private static String description    = "description";
-    private static String link           = "link";
-    private static String pubDate        = "pubDate";
-    private static String item           = "item";
+    private String guid           = "guid";
+    private String title          = "title";
+    private String description    = "description";
+    private String link           = "link";
+    private String pubDate        = "pubDate";
+    private String item           = "item";
+    private String mediaContent   = "media:content";
 
-    public FeedAdapter(String name)
+    public FeedAdapter()
     {
-        this.sourceName = name;
-    }
 
-
-    public FeedAdapter make()
-    {
-        this.sourceName = String.format("%s%s", this.sourceName.substring(0, 1).toUpperCase(), this.sourceName.substring(1));
-
-        try {
-            Class<?> Adapter = Class.forName(this.sourceName);
-            Constructor<?> cons = Adapter.getConstructor(String.class);
-            Object adapterObject = cons.newInstance("MyAttributeValue");
-
-            return (FeedAdapter) adapterObject;
-        }catch(Exception exception){
-            System.out.println(exception.getMessage());
-        }
-
-        return this;
     }
 
 
@@ -79,7 +61,7 @@ public class FeedAdapter {
     }
 
     public void setGuid(String guid) {
-        FeedAdapter.guid = guid;
+        this.guid = guid;
     }
 
     public String getTitle() {
@@ -87,7 +69,7 @@ public class FeedAdapter {
     }
 
     public void setTitle(String title) {
-        FeedAdapter.title = title;
+        this.title = title;
     }
 
     public String getDescription() {
@@ -95,7 +77,7 @@ public class FeedAdapter {
     }
 
     public void setDescription(String description) {
-        FeedAdapter.description = description;
+        this.description = description;
     }
 
     public String getLink() {
@@ -103,7 +85,15 @@ public class FeedAdapter {
     }
 
     public void setLink(String link) {
-        FeedAdapter.link = link;
+        this.link = link;
+    }
+
+    public String getMediaContent() {
+        return mediaContent;
+    }
+
+    public void setMediaContent(String mediaContent) {
+        this.mediaContent = mediaContent;
     }
 
     public String getPubDate() {
@@ -111,15 +101,14 @@ public class FeedAdapter {
     }
 
     public void setPubDate(String pubDate) {
-        FeedAdapter.pubDate = pubDate;
+        this.pubDate = pubDate;
     }
-
 
     public String getItem() {
         return item;
     }
 
     public void setItem(String item) {
-        FeedAdapter.item = item;
+        this.item = item;
     }
 }

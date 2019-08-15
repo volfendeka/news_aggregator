@@ -1,5 +1,6 @@
 package news.aggregator.Service;
 
+import news.aggregator.Adapter.AdapterFactory;
 import news.aggregator.Adapter.FeedAdapter;
 import news.aggregator.Entity.Feed;
 import news.aggregator.Entity.FeedCategory;
@@ -46,9 +47,9 @@ public class FeedParser {
             NodeList nl = doc.getElementsByTagName("*");
             Node n;
 
-            FeedAdapter feedAdapter = new FeedAdapter(source.getName());
-            FeedAdapter adapter = feedAdapter.make();
-            Iterable<Feed> feedRep= this.feedRepository.findAll();
+            AdapterFactory adapterFactory = new AdapterFactory();
+            FeedAdapter adapter = adapterFactory.make(source.getName());
+
             Iterable<FeedCategory> category = this.feedCategoryRepository.findAll();
 
             FeedCategory feedCategory = category.iterator().next();
@@ -88,12 +89,15 @@ public class FeedParser {
                             Date pubDate = adapter.convertDate(field.getTextContent(), parsePatterns);
                             feed.setDatePublished(pubDate);
                         }
-
-                        if(feed.isValid()){
-                            feed.setSource(source);
-                            feedRepository.save(feed);
-                            feed = new Feed();
+                        if(field.getNodeName().equals(adapter.getMediaContent())){
+                            //todo: move "url" to adapter
+                            feed.setMediaContent(field.getAttributes().getNamedItem("url").getNodeValue());
                         }
+                    }
+                    if(feed.isValid()){
+                        feed.setSource(source);
+                        feedRepository.save(feed);
+                        feed = new Feed();
                     }
                 }
 

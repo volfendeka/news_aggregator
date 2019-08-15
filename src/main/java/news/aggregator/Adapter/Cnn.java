@@ -10,7 +10,7 @@ public class Cnn extends FeedAdapter {
     private final ArrayList feedMap;
 
     public Cnn() {
-        super("cnn");
+        super();
         this.feedMap = new ArrayList();
     }
 

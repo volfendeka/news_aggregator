@@ -18,8 +18,6 @@ import java.util.concurrent.Executors;
 public class FeedRunner {
 
     @Autowired
-    private SourceRepository sourceRepository;
-    @Autowired
     private SourceRepositoryCustom sourceRepositoryCustom;
     @Autowired
     private Worker worker;
@@ -29,7 +27,6 @@ public class FeedRunner {
     private static  final int THREADS = 10;
 
     public String init() {
-        //Iterable<Source> sources = sourceRepository.findAll();
         List<Source> sources = sourceRepositoryCustom.getActiveSources();
         ExecutorService executor = Executors.newFixedThreadPool(THREADS);
 

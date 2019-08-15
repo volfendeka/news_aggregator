@@ -10,7 +10,7 @@ public class Bbc extends FeedAdapter {
     private final ArrayList feedMap;
 
     public Bbc() {
-        super("bbc");
+        super();
         this.feedMap = new ArrayList();
     }
 

@@ -3,12 +3,13 @@ package news.aggregator.Adapter;
 import java.util.ArrayList;
 import java.util.List;
 
-public class New_york_times extends FeedAdapter {
+public class Reuters extends FeedAdapter {
 
     private String pubDatePattern = "E, d MMM yyyy hh:mm:ss Z";
+
     private final ArrayList feedMap;
 
-    public New_york_times() {
+    public Reuters() {
         super();
         this.feedMap = new ArrayList();
     }
@@ -21,5 +22,4 @@ public class New_york_times extends FeedAdapter {
 
         return parsePatterns;
     }
-
 }

@@ -22,6 +22,8 @@ public class Feed {
 
     private String link;
 
+    private String mediaContent;
+
     private Date datePublished;
 
     private Date dateCreated;
@@ -43,7 +45,8 @@ public class Feed {
                         this.getDescription() == null ||
                         this.getFeedCategory() == null ||
                         this.getLink() == null ||
-                        this.getDatePublished() == null
+                        this.getDatePublished() == null //||
+                        //this.getMediaContent() == null
         )
         {
             return false;
@@ -94,13 +97,22 @@ public class Feed {
         this.description = description;
     }
 
+    public String getMediaContent() {
+        return mediaContent;
+    }
+
+    public void setMediaContent(String mediaContent) {
+        this.mediaContent = mediaContent;
+        if(mediaContent.length() > 254){
+            this.mediaContent = mediaContent.substring(0, 254);
+        }
+    }
+
     public Date getDatePublished() {
         return datePublished;
     }
 
     public void setDatePublished(Date datePublished) {
-        System.out.println("My parsed date setter:" + datePublished.toString());
-
         this.datePublished = datePublished;
     }
 

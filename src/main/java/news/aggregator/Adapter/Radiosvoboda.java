@@ -3,14 +3,17 @@ package news.aggregator.Adapter;
 import java.util.ArrayList;
 import java.util.List;
 
-public class New_york_times extends FeedAdapter {
+public class Radiosvoboda extends FeedAdapter {
 
+    private final String  mediaContentCustom = "enclosure";
     private String pubDatePattern = "E, d MMM yyyy hh:mm:ss Z";
+
     private final ArrayList feedMap;
 
-    public New_york_times() {
+    public Radiosvoboda() {
         super();
         this.feedMap = new ArrayList();
+        this.setMediaContent(mediaContentCustom);
     }
 
     @Override
@@ -21,5 +24,4 @@ public class New_york_times extends FeedAdapter {
 
         return parsePatterns;
     }
-
 }
