@@ -7,8 +7,6 @@ import java.util.*;
 
 public class FeedAdapter {
 
-    private String sourceName;
-
     private String guid           = "guid";
     private String title          = "title";
     private String description    = "description";
@@ -16,6 +14,8 @@ public class FeedAdapter {
     private String pubDate        = "pubDate";
     private String item           = "item";
     private String mediaContent   = "media:content";
+    private String url            = "url";
+    private String category       = "category";
 
     public FeedAdapter()
     {
@@ -94,6 +94,22 @@ public class FeedAdapter {
 
     public void setMediaContent(String mediaContent) {
         this.mediaContent = mediaContent;
+    }
+
+    public String getUrl() {
+        return url;
+    }
+
+    public void setUrl(String url) {
+        this.url = url;
+    }
+
+    public String getCategory() {
+        return category;
+    }
+
+    public void setCategory(String category) {
+        this.category = category;
     }
 
     public String getPubDate() {

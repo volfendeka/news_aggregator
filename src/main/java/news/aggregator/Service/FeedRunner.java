@@ -10,12 +10,14 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.util.Date;
 import java.util.List;
+import java.util.TimerTask;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
 @Service
-public class FeedRunner {
+public class FeedRunner extends TimerTask {
 
     @Autowired
     private SourceRepositoryCustom sourceRepositoryCustom;
@@ -46,5 +48,14 @@ public class FeedRunner {
         System.out.println("Executor finshed");
 
     return "exit runner";
+    }
+
+    public void run() {
+        Date statDate = new Date();
+        System.out.println("start time:" + statDate.toString());
+        this.init();
+        Date endDate = new Date();
+        System.out.println("end time:" + endDate.toString());
+
     }
 }

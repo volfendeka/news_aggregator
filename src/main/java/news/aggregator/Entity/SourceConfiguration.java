@@ -1,29 +1,28 @@
 package news.aggregator.Entity;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.*;
+
 import javax.persistence.*;
 import java.util.HashSet;
 import java.util.Set;
 
 @Entity // This tells Hibernate to make a table out of this class
-public class FeedCategory {
+@JsonIgnoreProperties({"hibernateLazyInitializer", "handler"})
+public class SourceConfiguration {
     @Id
     @GeneratedValue(strategy=GenerationType.IDENTITY)
     private Integer id;
 
-    @Column(unique = true)
     private String name;
-
-    private Integer status;
 
     @ManyToMany(cascade = { CascadeType.ALL }, fetch = FetchType.LAZY)
     @JoinTable(
-            name = "feed_feed_category",
-            joinColumns = { @JoinColumn(name = "feed_category_id") },
-            inverseJoinColumns = { @JoinColumn(name = "feed_id") }
+            name = "source_source_configuration",
+            joinColumns = { @JoinColumn(name = "source_configuration_id") },
+            inverseJoinColumns = { @JoinColumn(name = "source_id") }
     )
     @JsonIgnore
-    private Set<Feed> feeds = new HashSet<>();
+    private Set<Source> sources = new HashSet<>();
 
     public Integer getId() {
         return id;
@@ -41,19 +40,12 @@ public class FeedCategory {
         this.name = name;
     }
 
-    public Set<Feed> getFeeds() {
-        return feeds;
+    public Set<Source> getSources() {
+        return sources;
     }
 
-    public void setFeeds(Set<Feed> feed) {
-        this.feeds = feed;
+    public void setSources(Set<Source> sources) {
+        this.sources = sources;
     }
 
-    public Integer getStatus() {
-        return status;
-    }
-
-    public void setStatus(Integer status) {
-        this.status = status;
-    }
 }

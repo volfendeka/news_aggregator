@@ -21,10 +21,8 @@ import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import java.io.FileWriter;
 import java.io.StringReader;
-import java.util.Arrays;
-import java.util.Date;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
+import java.util.stream.StreamSupport;
 
 @Service
 public class FeedParser {
@@ -50,9 +48,7 @@ public class FeedParser {
             AdapterFactory adapterFactory = new AdapterFactory();
             FeedAdapter adapter = adapterFactory.make(source.getName());
 
-            Iterable<FeedCategory> category = this.feedCategoryRepository.findAll();
-
-            FeedCategory feedCategory = category.iterator().next();
+            Iterable<FeedCategory> feedCategories = this.feedCategoryRepository.findAll();
 
             fw.write(responseEntity.getBody());
             fw.close();
@@ -71,7 +67,6 @@ public class FeedParser {
 
                         Date date = new Date();
                         feed.setDateCreated(date);
-                        feed.setFeedCategory(feedCategory);
                         if(field.getNodeName().equals(adapter.getTitle())){
                             feed.setTitle(field.getTextContent());
                         }
@@ -90,8 +85,13 @@ public class FeedParser {
                             feed.setDatePublished(pubDate);
                         }
                         if(field.getNodeName().equals(adapter.getMediaContent())){
-                            //todo: move "url" to adapter
-                            feed.setMediaContent(field.getAttributes().getNamedItem("url").getNodeValue());
+                            feed.setMediaContent(field.getAttributes().getNamedItem(adapter.getUrl()).getNodeValue());
+                        }
+
+                        if(field.getNodeName().equals(adapter.getCategory())){
+                            FeedCategory category = this.lookupForCategory(field.getTextContent(), feedCategories);
+
+                            feed.addCategory(category);
                         }
                     }
                     if(feed.isValid()){
@@ -130,6 +130,28 @@ public class FeedParser {
         DocumentBuilder builder = factory.newDocumentBuilder();
         InputSource is = new InputSource(new StringReader(xml));
         return builder.parse(is);
+    }
+
+    /**
+     * Lookup if we already have category or create new one
+     *
+     * @param categoryName
+     * @param feedCategories
+     * @return
+     */
+    private FeedCategory lookupForCategory(String categoryName, Iterable<FeedCategory>feedCategories)
+    {
+        for (final FeedCategory category : feedCategories) {
+            if (category.getName().equals(categoryName.toLowerCase())) {
+                return category;
+            }
+        }
+
+        FeedCategory newCategory = new FeedCategory();
+        newCategory.setName(categoryName.toLowerCase());
+
+        feedCategoryRepository.save(newCategory);
+        return newCategory;
     }
 
 }

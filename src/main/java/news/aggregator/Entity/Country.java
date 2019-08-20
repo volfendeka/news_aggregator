@@ -1,9 +1,11 @@
 package news.aggregator.Entity;
 
+import com.fasterxml.jackson.annotation.*;
 import javax.persistence.*;
 import java.util.Set;
 
 @Entity // This tells Hibernate to make a table out of this class
+@JsonIgnoreProperties({"hibernateLazyInitializer", "handler"})
 public class Country {
     @Id
     @GeneratedValue(strategy=GenerationType.IDENTITY)
@@ -13,7 +15,8 @@ public class Country {
 
     private String name;
 
-    @OneToMany(mappedBy = "country", cascade = CascadeType.ALL)
+    @OneToMany(mappedBy = "country", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    @JsonIgnore
     private Set<Source> source;
 
     public Integer getId() {

@@ -1,9 +1,12 @@
 package news.aggregator.Entity;
 
+import com.fasterxml.jackson.annotation.*;
+
 import javax.persistence.*;
 import java.util.Set;
 
 @Entity // This tells Hibernate to make a table out of this class
+@JsonIgnoreProperties({"hibernateLazyInitializer", "handler"})
 public class SourceType {
     @Id
     @GeneratedValue(strategy=GenerationType.IDENTITY)
@@ -11,8 +14,9 @@ public class SourceType {
 
     private String name;
 
-    @OneToMany(mappedBy = "sourceType", cascade = CascadeType.ALL)
-    private Set<Source> source;
+    @OneToMany(mappedBy = "sourceType", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    @JsonIgnore
+    private Set<Source> sources;
 
     public Integer getId() {
         return id;
@@ -30,12 +34,12 @@ public class SourceType {
         this.name = name;
     }
 
-    public Set<Source> getSource() {
-        return source;
+    public Set<Source> getSources() {
+        return sources;
     }
 
-    public void setSource(Set<Source> source) {
-        this.source = source;
+    public void setSources(Set<Source> sources) {
+        this.sources = sources;
     }
 
 }

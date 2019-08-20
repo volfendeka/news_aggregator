@@ -1,9 +1,13 @@
 package news.aggregator.Entity;
 
+import com.fasterxml.jackson.annotation.*;
+
 import javax.persistence.*;
+import java.util.HashSet;
 import java.util.Set;
 
 @Entity // This tells Hibernate to make a table out of this class
+@JsonIgnoreProperties({"hibernateLazyInitializer", "handler"})
 public class Source {
     @Id
     @GeneratedValue(strategy=GenerationType.IDENTITY)
@@ -15,20 +19,21 @@ public class Source {
 
     private String rssUri;
 
-    @ManyToOne
-    @JoinColumn
+    @ManyToOne(fetch = FetchType.LAZY)
     private SourceStatus sourceStatus;
 
-    @ManyToOne
-    @JoinColumn
+    @ManyToOne(fetch = FetchType.LAZY)
     private SourceType sourceType;
 
-    @ManyToOne
-    @JoinColumn
+    @ManyToOne(fetch = FetchType.LAZY)
     private Country country;
 
-    @OneToMany(mappedBy = "source", cascade = CascadeType.ALL)
-    private Set<Feed> feed;
+    @OneToMany(mappedBy = "source", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    @JsonIgnore
+    private Set<Feed> feeds;
+
+    @ManyToMany(mappedBy = "sources", fetch = FetchType.LAZY)
+    private Set<SourceConfiguration> sourceConfigurations = new HashSet<>();
 
     public Integer getId() {
         return id;
@@ -86,11 +91,19 @@ public class Source {
         this.sourceStatus = sourceStatus;
     }
 
-    public Set<Feed> getFeed() {
-        return feed;
+    public Set<Feed> getFeeds() {
+        return feeds;
     }
 
-    public void setFeed(Set<Feed> feed) {
-        this.feed = feed;
+    public void setFeeds(Set<Feed> feeds) {
+        this.feeds = feeds;
     }
+
+    public Set<SourceConfiguration> getSourceConfigurations() {
+        return sourceConfigurations;
+    }
+    public void setSourceConfigurations(Set<SourceConfiguration> sourceConfigurations) {
+        this.sourceConfigurations = sourceConfigurations;
+    }
+
 }

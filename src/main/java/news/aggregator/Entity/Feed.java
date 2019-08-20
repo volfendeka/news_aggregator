@@ -1,10 +1,9 @@
 package news.aggregator.Entity;
 
-import antlr.StringUtils;
-import org.hibernate.validator.constraints.Length;
-
 import javax.persistence.*;
 import java.util.Date;
+import java.util.HashSet;
+import java.util.Set;
 
 @Entity // This tells Hibernate to make a table out of this class
 public class Feed {
@@ -28,12 +27,10 @@ public class Feed {
 
     private Date dateCreated;
 
-    @ManyToOne
-    @JoinColumn
-    private FeedCategory category;
+    @ManyToMany(mappedBy = "feeds", fetch = FetchType.LAZY)
+    private Set<FeedCategory> categories = new HashSet<>();
 
-    @ManyToOne
-    @JoinColumn
+    @ManyToOne(fetch = FetchType.LAZY)
     private Source source;
 
 
@@ -43,7 +40,6 @@ public class Feed {
                 this.getGuid() == null ||
                         this.getTitle() == null ||
                         this.getDescription() == null ||
-                        this.getFeedCategory() == null ||
                         this.getLink() == null ||
                         this.getDatePublished() == null //||
                         //this.getMediaContent() == null
@@ -71,6 +67,13 @@ public class Feed {
         if(guid.length() > 254){
             this.guid = guid.substring(0, 254);
         }
+    }
+
+    public void addCategory(FeedCategory category)
+    {
+        Set<FeedCategory> categories = this.getCategories();
+        categories.add(category);
+        this.setCategories(categories);
     }
 
     public String getTitle() {
@@ -124,12 +127,12 @@ public class Feed {
         this.dateCreated = dateCreated;
     }
 
-    public FeedCategory getFeedCategory() {
-        return category;
+    public Set<FeedCategory> getCategories() {
+        return categories;
     }
 
-    public void setFeedCategory(FeedCategory category) {
-        this.category = category;
+    public void setCategories(Set<FeedCategory> categories) {
+        this.categories = categories;
     }
 
     public Source getSource() {
