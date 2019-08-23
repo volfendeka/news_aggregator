@@ -14,7 +14,6 @@ public class AdapterFactory {
             Constructor<?> cons = Adapter.getConstructor(String.class.getClasses());
             Object adapterObject = cons.newInstance();
 
-            System.out.println(adapterObject.getClass());
             return (FeedAdapter) adapterObject;
         }catch(Exception exception){
             System.out.println(exception.toString());

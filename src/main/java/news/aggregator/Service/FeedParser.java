@@ -3,8 +3,10 @@ package news.aggregator.Service;
 import news.aggregator.Adapter.AdapterFactory;
 import news.aggregator.Adapter.FeedAdapter;
 import news.aggregator.Entity.Feed;
+import news.aggregator.Entity.FeedCategories;
 import news.aggregator.Entity.FeedCategory;
 import news.aggregator.Entity.Source;
+import news.aggregator.Repository.FeedCategoriesRepository;
 import news.aggregator.Repository.FeedCategoryRepository;
 import news.aggregator.Repository.FeedRepository;
 import news.aggregator.Repository.SourceRepository;
@@ -31,10 +33,9 @@ public class FeedParser {
     private FeedRepository feedRepository;
     @Autowired
     private FeedCategoryRepository feedCategoryRepository;
-   /*
     @Autowired
-    private SourceRepository sourceRepository;
-*/
+    private FeedCategoriesRepository feedCategoriesRepository;
+
     public void parse(Source source, ResponseEntity<String> responseEntity)
     {
         try{
@@ -97,6 +98,12 @@ public class FeedParser {
                     if(feed.isValid()){
                         feed.setSource(source);
                         feedRepository.save(feed);
+                        for(FeedCategory feedCategory: feed.getCategories()){
+                            FeedCategories feedCategoriesItem = new FeedCategories();
+                            feedCategoriesItem.setFeedId(feed.getId());
+                            feedCategoriesItem.setCategoryId(feedCategory.getId());
+                            feedCategoriesRepository.save(feedCategoriesItem);
+                        }
                         feed = new Feed();
                     }
                 }

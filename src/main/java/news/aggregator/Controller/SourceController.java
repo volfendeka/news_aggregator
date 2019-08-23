@@ -1,7 +1,11 @@
 package news.aggregator.Controller;
 
 import news.aggregator.Entity.Source;
+import news.aggregator.Entity.SourceStatus;
+import news.aggregator.Entity.SourceType;
 import news.aggregator.Repository.SourceRepository;
+import news.aggregator.Repository.SourceStatusRepository;
+import news.aggregator.Repository.SourceTypeRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -16,6 +20,10 @@ public class SourceController {
 
     @Autowired
     private SourceRepository sourceRepository;
+    @Autowired
+    private SourceTypeRepository sourceTypeRepository;
+    @Autowired
+    private SourceStatusRepository sourceStatusRepository;
 
     @GetMapping("/source")
     public @ResponseBody Iterable<Source> getAllSources() {
@@ -49,5 +57,15 @@ public class SourceController {
         return ResponseEntity.noContent().build();
     }
 
+    @GetMapping("/source/type")
+    public @ResponseBody Iterable<SourceType> getAllSourceTypes() {
+        // This returns a JSON or XML with the users
+        return sourceTypeRepository.findAll();
+    }
 
+    @GetMapping("/source/status")
+    public @ResponseBody Iterable<SourceStatus> getAllSourceStatuses() {
+        // This returns a JSON or XML with the users
+        return sourceStatusRepository.findAll();
+    }
 }

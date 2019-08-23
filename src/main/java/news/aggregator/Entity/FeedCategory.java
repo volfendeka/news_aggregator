@@ -16,13 +16,7 @@ public class FeedCategory {
 
     private Integer status;
 
-    @ManyToMany(cascade = { CascadeType.ALL }, fetch = FetchType.LAZY)
-    @JoinTable(
-            name = "feed_feed_category",
-            joinColumns = { @JoinColumn(name = "feed_category_id") },
-            inverseJoinColumns = { @JoinColumn(name = "feed_id") }
-    )
-    @JsonIgnore
+    @Transient
     private Set<Feed> feeds = new HashSet<>();
 
     public Integer getId() {

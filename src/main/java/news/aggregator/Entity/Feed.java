@@ -27,7 +27,7 @@ public class Feed {
 
     private Date dateCreated;
 
-    @ManyToMany(mappedBy = "feeds", fetch = FetchType.LAZY)
+    @Transient
     private Set<FeedCategory> categories = new HashSet<>();
 
     @ManyToOne(fetch = FetchType.LAZY)
@@ -41,8 +41,7 @@ public class Feed {
                         this.getTitle() == null ||
                         this.getDescription() == null ||
                         this.getLink() == null ||
-                        this.getDatePublished() == null //||
-                        //this.getMediaContent() == null
+                        this.getDatePublished() == null
         )
         {
             return false;
@@ -71,9 +70,7 @@ public class Feed {
 
     public void addCategory(FeedCategory category)
     {
-        Set<FeedCategory> categories = this.getCategories();
-        categories.add(category);
-        this.setCategories(categories);
+        this.categories.add(category);
     }
 
     public String getTitle() {
