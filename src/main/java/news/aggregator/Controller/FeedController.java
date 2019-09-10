@@ -1,6 +1,8 @@
 package news.aggregator.Controller;
 
+import com.fasterxml.jackson.databind.util.JSONPObject;
 import news.aggregator.Entity.Feed;
+import news.aggregator.Entity.Source;
 import news.aggregator.Entity.User;
 import news.aggregator.Repository.FeedRepository;
 import news.aggregator.Repository.FeedRepositoryCustom;
@@ -31,28 +33,38 @@ public class FeedController {
         return "Greetings from Spring Boot!";
     }
 
-    @RequestMapping("/gather")
-    public String launchFeedRunner() {
+    @RequestMapping("/runner/start")
+    public ResponseEntity<Object> startFeedRunner() {
 
         System.out.println("runner started");
 
-        String response = feedRunner.init();
+        List<Source> response = feedRunner.init();
 
-        System.out.println("ru  nner finished");
-        return response;
+        System.out.println("runner finished");
+
+        if(response.size() > 0){
+            return ResponseEntity.ok().body(response);
+        }
+        return ResponseEntity.status(HttpStatus.NO_CONTENT).body(response);
     }
 
-    @RequestMapping(
-            value = "/get/all"
-            //method = RequestMethod.GET,
-            //produces = { MimeTypeUtils.APPLICATION_JSON_VALUE },
-            //headers = "Accept=application/json"
-    )
+    @RequestMapping("/runner/stop")
+    public ResponseEntity<Object> stopFeedRunner() {
+
+        System.out.println("runner stop");
+
+        List<Source> response = feedRunner.destroy();
+
+        if(response.size() > 0){
+            return ResponseEntity.ok().body(response);
+        }
+        return ResponseEntity.status(HttpStatus.NO_CONTENT).body(response);
+    }
+
+    @GetMapping("/{limit}")
     public @ResponseBody
-    Iterable<Feed> getAllFeeds() {
+    Iterable<Feed> getAllFeeds(@PathVariable int limit) {
         // This returns a JSON or XML with the users
-        return feedRepository.findAll();
+        return feedRepositoryCustom.getFeeds(limit);
     }
-
-
 }

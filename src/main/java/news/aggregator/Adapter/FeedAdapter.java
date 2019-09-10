@@ -1,11 +1,14 @@
 package news.aggregator.Adapter;
 
+import news.aggregator.Entity.SourceConfiguration;
+
+import java.lang.reflect.Method;
 import java.text.DateFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.*;
 
-public class FeedAdapter {
+public class FeedAdapter implements FeedAdapterInterface{
 
     private String guid           = "guid";
     private String title          = "title";
@@ -22,6 +25,20 @@ public class FeedAdapter {
 
     }
 
+    public void setConfigurations(Set<SourceConfiguration> sourceConfiguration)
+    {
+        for (SourceConfiguration config: sourceConfiguration) {
+
+            String confName = config.getName();
+            String ConfigName = String.format("%s%s", confName.substring(0, 1).toUpperCase(), confName.substring(1));
+            try{
+                Method setterMethod = this.getClass().getMethod("set" + ConfigName, String.class);
+                setterMethod.invoke(this, config.getValue());
+            }catch(Exception exception){
+                System.out.println(config.getName() + ": " + config.getValue() + " Config doesn't exist " + exception.getMessage());
+            }
+        }
+    }
 
     public List<String> getParsePatterns()
     {
@@ -36,6 +53,12 @@ public class FeedAdapter {
                 "E, d MMM yyyy hh:mm:ss Z"
         ));
         return patterns;
+    }
+
+    public void setPubDatePattern(String pubDatePattern) {
+        List<String> parsePatterns =  this.getParsePatterns();
+
+        parsePatterns.add(pubDate);
     }
 
     public Date convertDate(String dateString, List<String> parsePatterns)

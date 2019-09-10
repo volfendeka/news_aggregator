@@ -1,11 +1,10 @@
 package news.aggregator.Controller;
 
+import news.aggregator.Entity.Country;
 import news.aggregator.Entity.Source;
 import news.aggregator.Entity.SourceStatus;
 import news.aggregator.Entity.SourceType;
-import news.aggregator.Repository.SourceRepository;
-import news.aggregator.Repository.SourceStatusRepository;
-import news.aggregator.Repository.SourceTypeRepository;
+import news.aggregator.Repository.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -21,9 +20,13 @@ public class SourceController {
     @Autowired
     private SourceRepository sourceRepository;
     @Autowired
+    private SourceRepositoryCustom sourceRepositoryCustom;
+    @Autowired
     private SourceTypeRepository sourceTypeRepository;
     @Autowired
     private SourceStatusRepository sourceStatusRepository;
+    @Autowired
+    private CountryRepository countryRepository;
 
     @GetMapping("/source")
     public @ResponseBody Iterable<Source> getAllSources() {
@@ -33,12 +36,12 @@ public class SourceController {
 
     @PostMapping("/source")
     public ResponseEntity<Object> createSource(@RequestBody Source source) {
+
+        this.prepareSource(source);
+
         Source savedSource = sourceRepository.save(source);
 
-        URI location = ServletUriComponentsBuilder.fromCurrentRequest().path("/{id}")
-                .buildAndExpand(savedSource.getId()).toUri();
-
-        return ResponseEntity.created(location).build();
+        return ResponseEntity.ok().body(savedSource);
 
     }
 
@@ -52,9 +55,11 @@ public class SourceController {
 
         source.setId(id);
 
-        sourceRepository.save(source);
+        this.prepareSource(source);
 
-        return ResponseEntity.noContent().build();
+        Source updatedSource = sourceRepository.save(source);
+
+        return ResponseEntity.ok().body(updatedSource);
     }
 
     @GetMapping("/source/type")
@@ -67,5 +72,19 @@ public class SourceController {
     public @ResponseBody Iterable<SourceStatus> getAllSourceStatuses() {
         // This returns a JSON or XML with the users
         return sourceStatusRepository.findAll();
+    }
+
+    /**
+     * Find relations and set as entities for Source
+     * @param source
+     */
+    private void prepareSource(Source source) {
+        Optional<Country> countryOptional = countryRepository.findById(source.getCountry().getId());
+        Optional<SourceType> sourceTypeOptional = sourceTypeRepository.findById(source.getSourceType().getId());
+        Optional<SourceStatus> sourceStatusOptional = sourceStatusRepository.findById(source.getSourceStatus().getId());
+
+        source.setCountry(countryOptional.orElse(source.getCountry()));
+        source.setSourceType(sourceTypeOptional.orElse(source.getSourceType()));
+        source.setSourceStatus(sourceStatusOptional.orElse(source.getSourceStatus()));
     }
 }

@@ -15,14 +15,11 @@ public class SourceConfiguration {
 
     private String name;
 
-    @ManyToMany(cascade = { CascadeType.ALL }, fetch = FetchType.LAZY)
-    @JoinTable(
-            name = "source_source_configuration",
-            joinColumns = { @JoinColumn(name = "source_configuration_id") },
-            inverseJoinColumns = { @JoinColumn(name = "source_id") }
-    )
+    private String value;
+
+    @ManyToOne(cascade = { CascadeType.ALL }, fetch = FetchType.LAZY)
     @JsonIgnore
-    private Set<Source> sources = new HashSet<>();
+    private Source source;
 
     public Integer getId() {
         return id;
@@ -40,12 +37,20 @@ public class SourceConfiguration {
         this.name = name;
     }
 
-    public Set<Source> getSources() {
-        return sources;
+    public String getValue() {
+        return value;
     }
 
-    public void setSources(Set<Source> sources) {
-        this.sources = sources;
+    public void setValue(String value) {
+        this.value = value;
+    }
+
+    public Source getSource() {
+        return source;
+    }
+
+    public void setSource(Source source) {
+        this.source = source;
     }
 
 }

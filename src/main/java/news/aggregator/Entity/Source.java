@@ -19,21 +19,21 @@ public class Source {
 
     private String rssUri;
 
-    @ManyToOne(fetch = FetchType.LAZY)
+    @ManyToOne(cascade = CascadeType.ALL, fetch = FetchType.LAZY)
     private SourceStatus sourceStatus;
 
-    @ManyToOne(fetch = FetchType.LAZY)
+    @ManyToOne(cascade = CascadeType.ALL, fetch = FetchType.LAZY)
     private SourceType sourceType;
 
-    @ManyToOne(fetch = FetchType.LAZY)
+    @ManyToOne(cascade = CascadeType.ALL, fetch = FetchType.LAZY)
     private Country country;
 
     @OneToMany(mappedBy = "source", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
     @JsonIgnore
     private Set<Feed> feeds;
 
-    @ManyToMany(mappedBy = "sources", fetch = FetchType.LAZY)
-    private Set<SourceConfiguration> sourceConfigurations = new HashSet<>();
+    @OneToMany(mappedBy = "source", fetch = FetchType.EAGER)
+    private Set<SourceConfiguration> sourceConfigurations;
 
     public Integer getId() {
         return id;

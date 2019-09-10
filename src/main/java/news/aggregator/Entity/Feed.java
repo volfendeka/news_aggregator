@@ -8,7 +8,7 @@ import java.util.Set;
 @Entity // This tells Hibernate to make a table out of this class
 public class Feed {
     @Id
-    @GeneratedValue(strategy=GenerationType.IDENTITY)
+    @GeneratedValue(strategy=GenerationType.AUTO)
     private Integer id;
 
     @Column(unique = true)
@@ -38,10 +38,10 @@ public class Feed {
     {
         if(
                 this.getGuid() == null ||
-                        this.getTitle() == null ||
-                        this.getDescription() == null ||
-                        this.getLink() == null ||
-                        this.getDatePublished() == null
+                this.getTitle() == null ||
+                this.getDescription() == null ||
+                this.getLink() == null ||
+                this.getDatePublished() == null
         )
         {
             return false;

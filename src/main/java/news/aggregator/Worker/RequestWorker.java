@@ -15,6 +15,10 @@ public class RequestWorker extends Worker implements Runnable{
     private FeedParser feedParser;
 
 
+    /**
+     * @param source
+     * @param feedParser
+     */
     public RequestWorker(Source source, FeedParser feedParser)
     {
         this.uri = source.getRssUri();
@@ -22,6 +26,9 @@ public class RequestWorker extends Worker implements Runnable{
         this.feedParser = feedParser;
     }
 
+    /**
+     * Runnable implementation. Ping active sources for available feeds
+     */
     public void run(){
         RestTemplate restTemplate = new RestTemplate();
 
@@ -32,10 +39,18 @@ public class RequestWorker extends Worker implements Runnable{
 
         ResponseEntity<String> responseEntity = restTemplate.exchange(this.uri, HttpMethod.GET, entity, String.class);
 
-        feedParser.parse(this.source, responseEntity);
+        try {
+            HttpStatus statusCode = responseEntity.getStatusCode();
+            if(statusCode.is2xxSuccessful()){
+                feedParser.parse(this.source, responseEntity);
+            }else {
+                throw new Exception("To many requests exception");
+            }
+        }catch (Exception exception){
+            System.out.println(exception.getMessage());
+        }
 
         System.out.println(this.uri + ": " + responseEntity.getStatusCode());
-
     }
 
 }

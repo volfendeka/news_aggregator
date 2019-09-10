@@ -10,15 +10,15 @@ public class AdapterFactory {
         String sourceName = String.format("%s%s", name.substring(0, 1).toUpperCase(), name.substring(1));
 
         try {
-            Class<?> Adapter = Class.forName("news.aggregator.Adapter." + sourceName);
-            Constructor<?> cons = Adapter.getConstructor(String.class.getClasses());
-            Object adapterObject = cons.newInstance();
+            //todo: implement adapter factry if any adapter required
+            //Class<?> Adapter = Class.forName("news.aggregator.Adapter." + sourceName);
+            //Constructor<?> cons = Adapter.getConstructor(String.class.getClasses());
+            //Object adapterObject = cons.newInstance();
 
-            return (FeedAdapter) adapterObject;
+            //return (FeedAdapter) adapterObject;
         }catch(Exception exception){
             System.out.println(exception.toString());
         }
-
         return new FeedAdapter();
     }
 }

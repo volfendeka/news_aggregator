@@ -2,18 +2,15 @@ package news.aggregator.Service;
 
 import news.aggregator.Adapter.AdapterFactory;
 import news.aggregator.Adapter.FeedAdapter;
-import news.aggregator.Entity.Feed;
-import news.aggregator.Entity.FeedCategories;
-import news.aggregator.Entity.FeedCategory;
-import news.aggregator.Entity.Source;
+import news.aggregator.Entity.*;
 import news.aggregator.Repository.FeedCategoriesRepository;
 import news.aggregator.Repository.FeedCategoryRepository;
 import news.aggregator.Repository.FeedRepository;
-import news.aggregator.Repository.SourceRepository;
-import org.hibernate.engine.jdbc.spi.SqlExceptionHelper;
+import org.hibernate.exception.ConstraintViolationException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
+import org.w3c.dom.CharacterData;
 import org.w3c.dom.Document;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
@@ -23,8 +20,9 @@ import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import java.io.FileWriter;
 import java.io.StringReader;
+import java.nio.charset.Charset;
+import java.sql.SQLException;
 import java.util.*;
-import java.util.stream.StreamSupport;
 
 @Service
 public class FeedParser {
@@ -36,10 +34,14 @@ public class FeedParser {
     @Autowired
     private FeedCategoriesRepository feedCategoriesRepository;
 
+    /**
+     * Parser core logic
+     * @param source
+     * @param responseEntity
+     */
     public void parse(Source source, ResponseEntity<String> responseEntity)
     {
         try{
-            FileWriter fw = new FileWriter("C:\\Users\\Administrator\\Desktop\\log\\" + source.getName() + ".txt");
             FileWriter fw1 = new FileWriter("C:\\Users\\Administrator\\Desktop\\log\\" + source.getName() + "_nodes.txt");
             Document doc = loadXMLFromString(responseEntity.getBody());
 
@@ -48,11 +50,9 @@ public class FeedParser {
 
             AdapterFactory adapterFactory = new AdapterFactory();
             FeedAdapter adapter = adapterFactory.make(source.getName());
+            adapter.setConfigurations(source.getSourceConfigurations());
 
             Iterable<FeedCategory> feedCategories = this.feedCategoryRepository.findAll();
-
-            fw.write(responseEntity.getBody());
-            fw.close();
 
             for (int i=0; i < nl.getLength(); i++)
             {
@@ -69,10 +69,10 @@ public class FeedParser {
                         Date date = new Date();
                         feed.setDateCreated(date);
                         if(field.getNodeName().equals(adapter.getTitle())){
-                            feed.setTitle(field.getTextContent());
+                            feed.setTitle(this.getCharacterDataFromElement(field));
                         }
                         if(field.getNodeName().equals(adapter.getDescription())){
-                            feed.setDescription(field.getTextContent());
+                            feed.setDescription(this.getCharacterDataFromElement(field));
                         }
                         if(field.getNodeName().equals(adapter.getLink())){
                             feed.setLink(field.getTextContent());
@@ -97,14 +97,30 @@ public class FeedParser {
                     }
                     if(feed.isValid()){
                         feed.setSource(source);
-                        feedRepository.save(feed);
-                        for(FeedCategory feedCategory: feed.getCategories()){
-                            FeedCategories feedCategoriesItem = new FeedCategories();
-                            feedCategoriesItem.setFeedId(feed.getId());
-                            feedCategoriesItem.setCategoryId(feedCategory.getId());
-                            feedCategoriesRepository.save(feedCategoriesItem);
+                        //save feed
+                        try {
+                            feedRepository.save(feed);
+                            //save feed categories
+                            try{
+                                for(FeedCategory feedCategory: feed.getCategories()){
+                                    FeedCategories feedCategoriesItem = new FeedCategories();
+                                    feedCategoriesItem.setFeedId(feed.getId());
+                                    feedCategoriesItem.setCategoryId(feedCategory.getId());
+                                    feedCategoriesRepository.save(feedCategoriesItem);
+                                }
+                            }catch (Exception exception){
+                                System.out.println("FeedCategory save exception: " + exception.getMessage());
+                                feed = new Feed();
+                                continue;
+                            }
+                            feed = new Feed();
+                            continue;
                         }
-                        feed = new Feed();
+                        catch (Exception exception){
+                            System.out.println("Feed save exception: " + exception.getMessage());
+                            feed = new Feed();
+                            continue;
+                        }
                     }
                 }
 
@@ -120,6 +136,47 @@ public class FeedParser {
         }
     }
 
+    /**
+     * Process node ![CDATA[..]]
+     * @param e
+     * @return
+     */
+    private String getCharacterDataFromElement(Node e) {
+        Node child = e.getFirstChild();
+        if (child instanceof CharacterData) {
+            CharacterData cd = (CharacterData) child;
+            return this.decodeContent(cd.getData(), "ISO-8859-1");
+        }
+        return this.decodeContent(e.getTextContent(), "ISO-8859-1");
+    }
+
+    /**
+     * Process different type of charset encoding (need to add other possible variants here)
+     * @param potentiallyEncodedContent
+     * @param charset
+     * @return
+     */
+    private String decodeContent(String potentiallyEncodedContent, String charset)
+    {
+        Charset encoder = Charset.forName(charset);
+        boolean dataEncoded = encoder.newEncoder().canEncode(potentiallyEncodedContent);
+
+        if(dataEncoded){
+            try{
+                return new String(potentiallyEncodedContent.getBytes(charset));
+            }catch(Exception exception){
+                System.out.println("Encoding failed" + exception.getMessage());
+                return potentiallyEncodedContent;
+            }
+        }
+
+        return potentiallyEncodedContent;
+    }
+
+    /**
+     * @param nodes
+     * @return
+     */
     private String getNodeString(NodeList nodes)
     {
         StringBuilder result = new StringBuilder();
@@ -131,6 +188,12 @@ public class FeedParser {
         return result.toString();
     }
 
+    /**
+     * Load xml DOM from string returned by source
+     * @param xml
+     * @return
+     * @throws Exception
+     */
     public Document loadXMLFromString(String xml) throws Exception
     {
         DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
@@ -141,7 +204,6 @@ public class FeedParser {
 
     /**
      * Lookup if we already have category or create new one
-     *
      * @param categoryName
      * @param feedCategories
      * @return

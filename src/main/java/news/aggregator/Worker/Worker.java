@@ -13,6 +13,12 @@ public class Worker{
     @Autowired
     private FeedParser feedParser;
 
+    /**
+     * Worker factory. Creates separate RequestWorker for each source.
+     *
+     * @param source
+     * @return
+     */
     public RequestWorker make(Source source)
     {
         return new RequestWorker(source, feedParser);
