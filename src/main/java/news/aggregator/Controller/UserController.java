@@ -33,6 +33,12 @@ public class UserController {
         return "Saved";
     }
 
+    @GetMapping(path="/alll")
+    public @ResponseBody Iterable<User> getAll() {
+        // This returns a JSON or XML with the users
+        return userRepository.findAll();
+    }
+
     @GetMapping(path="/all")
     public @ResponseBody Iterable<User> getAllUsers() {
         // This returns a JSON or XML with the users
