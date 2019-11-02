@@ -67,4 +67,11 @@ public class FeedController {
         // This returns a JSON or XML with the users
         return feedRepositoryCustom.getFeeds(limit);
     }
+
+    @GetMapping("/{limit}/{country_id}")
+    public @ResponseBody
+    Iterable<Feed> getFilteredFeeds(@PathVariable int limit, @PathVariable String country_id) {
+        // This returns a JSON or XML with the users
+        return feedRepositoryCustom.getFilteredFeeds(limit, country_id);
+    }
 }

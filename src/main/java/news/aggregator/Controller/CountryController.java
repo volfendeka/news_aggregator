@@ -20,4 +20,11 @@ public class CountryController {
         return countryRepository.findAll();
     }
 
+    @GetMapping("/countries_with_sources")
+    public @ResponseBody
+    Iterable<Country> getCountriesWithSources() {
+        // This returns a JSON or XML with the countries
+        return countryRepository.findAll();
+    }
+
 }

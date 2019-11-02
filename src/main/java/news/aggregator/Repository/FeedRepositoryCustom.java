@@ -26,6 +26,21 @@ public class FeedRepositoryCustom {
     }
 
     /**
+     * Get feeds filtered
+     * @param limit
+     * @param country_id
+     * @return
+     */
+    public List<Feed> getFilteredFeeds(Integer limit, String country_id) {
+        String sql = "SELECT feed.* FROM feed " +
+                "LEFT JOIN source s ON s.id = feed.source_id " +
+                "WHERE s.country_id = " + country_id +
+                " ORDER BY feed.date_created DESC LIMIT " + limit;
+        Query query = em.createNativeQuery(sql, Feed.class);
+        return query.getResultList();
+    }
+
+    /**
      * Feeds by source
      * @return
      */

@@ -30,8 +30,8 @@ public class AggregatorApplication {
 	public CommandLineRunner commandLineRunner(ApplicationContext ctx) {
 		return args -> {
 
-			//Timer timer = new Timer();
-			//timer.schedule(feedRunner, 0, 1800000);//10 Min
+			Timer timer = new Timer();
+			timer.schedule(feedRunner, 0, 30 * 100000); // 2 hours
 
 		};
 	}
