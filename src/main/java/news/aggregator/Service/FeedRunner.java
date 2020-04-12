@@ -12,9 +12,11 @@ import org.springframework.stereotype.Service;
 
 import java.util.Date;
 import java.util.List;
+import java.util.Collection;
 import java.util.TimerTask;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
+import java.util.concurrent.Future;
 
 import static java.util.Collections.EMPTY_LIST;
 
@@ -38,7 +40,7 @@ public class FeedRunner extends TimerTask {
     /**
      * Run threads with source batches
      */
-    private void processBatch (List<Source> sources) {
+    private void processBatch (List<Source> sources, int counter) {
 	    Collection batch = new ArrayList<>();
     	    for (Source source : sources) {
                 System.out.println(source.getName());
@@ -47,7 +49,7 @@ public class FeedRunner extends TimerTask {
                 logger.debug("Make workers");
             }
 	    List<Future> futures = this.executorService.invokeAll(batch);
-	    System.out.println("Batch from " + conter + " executed!");
+	    System.out.println("Batch from " + counter + " executed!");
 	    
 	    return;
     }
