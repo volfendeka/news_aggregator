@@ -33,7 +33,24 @@ public class FeedRunner extends TimerTask {
 
     Logger logger = LoggerFactory.getLogger(FeedRunner.class);
 
-    private static  final int THREADS = 20;
+    private static  final int THREADS = 5;
+
+    /**
+     * Run threads with source batches
+     */
+    private void processBatch (List<Source> sources) {
+	    Collection batch = new ArrayList<>();
+    	    for (Source source : sources) {
+                System.out.println(source.getName());
+                RequestWorker requestWorker = worker.make(source);
+		batch.add(requestWorker);
+                logger.debug("Make workers");
+            }
+	    List<Future> futures = this.executorService.invokeAll(batch);
+	    System.out.println("Batch from " + conter + " executed!");
+	    
+	    return;
+    }
 
     public List<Source> init() {
         try {
@@ -41,12 +58,12 @@ public class FeedRunner extends TimerTask {
 
             this.executorService = Executors.newFixedThreadPool(THREADS);
 
-            for (Source source : sources) {
-                System.out.println(source.getName());
-                RequestWorker requestWorker = worker.make(source);
-                this.executorService.execute(requestWorker);
-                logger.debug("Make workers");
-            }
+	    int counter = 0;
+	    while(counter < sources.size()){
+		    int nextInc = Math.min(sources.size() - counter, THREADS);                   
+		    this.processBatch(sources.subList(counter, counter + nextInc), counter);
+		    counter = counter + nextInc;
+	    }            
 
             this.executorService.shutdown();
 
