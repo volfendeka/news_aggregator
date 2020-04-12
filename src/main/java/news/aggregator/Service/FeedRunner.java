@@ -49,7 +49,11 @@ public class FeedRunner extends TimerTask {
 		batch.add(requestWorker);
                 logger.debug("Make workers");
             }
-	    List<Future> futures = this.executorService.invokeAll(batch);
+	    try{
+	    	List<Future> futures = this.executorService.invokeAll(batch);
+	    }catch(Exception exception){
+		System.out.println(exception.getMessage());
+	    }
 	    System.out.println("Batch from " + counter + " executed!");
 	    
 	    return;
