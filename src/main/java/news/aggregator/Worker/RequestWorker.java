@@ -4,15 +4,16 @@ import news.aggregator.Entity.Source;
 import news.aggregator.Service.FeedParser;
 import org.springframework.http.*;
 import org.springframework.web.client.RestTemplate;
-
+import java.util.concurrent.Callable;
 import java.util.Collections;
 
 
-public class RequestWorker extends Worker implements Runnable{
+public class RequestWorker extends Worker implements Callable<Integer>{
 
     private String uri;
     private Source source;
     private FeedParser feedParser;
+    private Integer sourceId;
 
 
     /**
@@ -22,14 +23,16 @@ public class RequestWorker extends Worker implements Runnable{
     public RequestWorker(Source source, FeedParser feedParser)
     {
         this.uri = source.getRssUri();
+	this.sourceId = source.getId();
         this.source = source;
         this.feedParser = feedParser;
     }
 
+    @Override
     /**
      * Runnable implementation. Ping active sources for available feeds
      */
-    public void run(){
+    public Integer call() throws Exception{
         RestTemplate restTemplate = new RestTemplate();
 
         HttpHeaders headers = new HttpHeaders();
@@ -51,6 +54,8 @@ public class RequestWorker extends Worker implements Runnable{
         }
 
         System.out.println(this.uri + ": " + responseEntity.getStatusCode());
-    }
+        
+        return this.sourceId;
+     }
 
 }

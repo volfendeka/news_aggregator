@@ -61,6 +61,7 @@ public class FeedRepositoryCustom {
      */
     public List<Object[]> getFeedsByDay() {
         String sql = "SELECT COUNT(f.id) amount, DATE(f.date_published) as pub_date FROM feed f " +
+                     "WHERE f.date_published > '2019-07-01 00:00:00'" +
                      "GROUP BY pub_date " +
                      "ORDER BY pub_date ASC";
         Query query = em.createNativeQuery(sql);

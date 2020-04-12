@@ -42,7 +42,6 @@ public class FeedParser {
     public void parse(Source source, ResponseEntity<String> responseEntity)
     {
         try{
-            FileWriter fw1 = new FileWriter("C:\\Users\\Administrator\\Desktop\\log\\" + source.getName() + "_nodes.txt");
             Document doc = loadXMLFromString(responseEntity.getBody());
 
             NodeList nl = doc.getElementsByTagName("*");
@@ -123,13 +122,7 @@ public class FeedParser {
                         }
                     }
                 }
-
-                fw1.write(n.getNodeName() + ": " + getNodeString(n.getChildNodes()) + "\r\n");
-                fw1.write(n.getNodeName() + ": " + n.getTextContent() + "\r\n");
-
             }
-            fw1.close();
-
         }catch (Exception e){
             System.out.println(e.toString());
             System.out.println(Arrays.toString(e.getStackTrace()));
@@ -194,7 +187,7 @@ public class FeedParser {
      * @return
      * @throws Exception
      */
-    public Document loadXMLFromString(String xml) throws Exception
+    private Document loadXMLFromString(String xml) throws Exception
     {
         DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
         DocumentBuilder builder = factory.newDocumentBuilder();

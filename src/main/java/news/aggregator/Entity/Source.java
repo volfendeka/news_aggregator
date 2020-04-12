@@ -3,6 +3,7 @@ package news.aggregator.Entity;
 import com.fasterxml.jackson.annotation.*;
 
 import javax.persistence.*;
+import java.util.Date;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -18,6 +19,12 @@ public class Source {
     private String baseUri;
 
     private String rssUri;
+
+    private Date createdDate;
+
+    private Date updatedDate;
+
+    private Date lastRunDate;
 
     @ManyToOne(cascade = CascadeType.ALL, fetch = FetchType.LAZY)
     private SourceStatus sourceStatus;
@@ -102,8 +109,32 @@ public class Source {
     public Set<SourceConfiguration> getSourceConfigurations() {
         return sourceConfigurations;
     }
+
     public void setSourceConfigurations(Set<SourceConfiguration> sourceConfigurations) {
         this.sourceConfigurations = sourceConfigurations;
     }
 
+    public Date getCreatedDate() {
+        return createdDate;
+    }
+
+    public void setCreatedDate(Date createdDate) {
+        this.createdDate = createdDate;
+    }
+
+    public Date getUpdatedDate() {
+        return updatedDate;
+    }
+
+    public void setUpdatedDate(Date updatedDate) {
+        this.updatedDate = updatedDate;
+    }
+
+    public Date getLastRunDate() {
+        return lastRunDate;
+    }
+
+    public void setLastRunDate(Date lastRunDate) {
+        this.lastRunDate = lastRunDate;
+    }
 }
